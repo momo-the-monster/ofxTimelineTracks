@@ -36,7 +36,7 @@
 
 ofxTLNotes::ofxTLNotes(){
 	placingSwitch = NULL;
-    noteRange = ofRange(0,11);
+    valueRange = ofRange(0,11);
 }
 
 ofxTLNotes::~ofxTLNotes(){
@@ -50,9 +50,9 @@ void ofxTLNotes::draw(){
     
     // Draw Row BGs
 	ofFill();
-	float rowHeight = bounds.height / (noteRange.span()+1);
+	float rowHeight = bounds.height / (valueRange.span()+1);
 	
-	for (int i = 0; i <= noteRange.span(); i++) {
+	for (int i = 0; i <= valueRange.span(); i++) {
 		// alternate row colors
 		if(i%2 == 1) {
 			ofSetColor(255, 255, 255, 50);
@@ -79,7 +79,7 @@ void ofxTLNotes::draw(){
 		if(startScreenX == endScreenX){
 			continue;
 		}
-        int whichRow = ofMap(switchKey->pitch, noteRange.max, noteRange.min, 0, noteRange.span());
+        int whichRow = ofMap(switchKey->pitch, valueRange.max, valueRange.min, 0, valueRange.span());
 		switchKey->display = ofRectangle(startScreenX, bounds.y + whichRow * rowHeight, endScreenX-startScreenX, rowHeight);
             
         // Drawing The Handles
@@ -484,12 +484,12 @@ ofxTLKeyframe* ofxTLNotes::keyframeAtScreenpoint(ofVec2f p){
 }
 
 string ofxTLNotes::getTrackType(){
-    return "Switches";
+    return "Notes";
 }
 
 #pragma mark NOTE METHODS
 int ofxTLNotes::pitchForScreenY(int y) {
 	float normalizedY = (y - bounds.y) / bounds.height;
-	int pitch = ofClamp(ofMap(normalizedY, 1, 0, noteRange.min, noteRange.max + 1), noteRange.min, noteRange.max); // clamp to range
+	int pitch = ofClamp(ofMap(normalizedY, 1, 0, valueRange.min, valueRange.max + 1), valueRange.min, valueRange.max); // clamp to range
 	return pitch;
 }

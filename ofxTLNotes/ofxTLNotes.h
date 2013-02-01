@@ -60,7 +60,6 @@ public:
 	virtual ~ofxTLNotes();
     
     // note-specific:
-    ofRange noteRange;
     int pitchForScreenY(int y);
     
     virtual void draw();
