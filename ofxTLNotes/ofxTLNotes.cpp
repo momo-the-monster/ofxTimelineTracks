@@ -36,6 +36,7 @@
 
 ofxTLNotes::ofxTLNotes(){
 	placingSwitch = NULL;
+    noteRange = ofRange(0,11);
 }
 
 ofxTLNotes::~ofxTLNotes(){

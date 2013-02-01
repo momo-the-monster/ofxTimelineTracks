@@ -60,6 +60,7 @@ public:
 	virtual ~ofxTLNotes();
     
     // note-specific:
+    ofRange noteRange;
     
     virtual void draw();
     
