@@ -31,9 +31,9 @@
  */
 
 #pragma once
-#include "ofxTLKeyframes.h"
+#include "ofxTLSwitches.h"
 
-class ofxTLNote : public ofxTLKeyframe {
+class ofxTLNote : public ofxTLSwitch {
 public:
     //NOTE this does not use time, but copies everything into the range
 	ofLongRange timeRange;
@@ -54,10 +54,12 @@ public:
 	bool triggeredOff;
 };
 
-class ofxTLNotes : public ofxTLKeyframes {
+class ofxTLNotes : public ofxTLSwitches {
 public:
 	ofxTLNotes();
 	virtual ~ofxTLNotes();
+    
+    // note-specific:
     
     virtual void draw();
     
