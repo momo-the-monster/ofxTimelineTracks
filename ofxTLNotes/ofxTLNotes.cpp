@@ -47,6 +47,23 @@ void ofxTLNotes::draw(){
     
     ofPushStyle();
 	ofFill();
+    
+    //************************ Range Rows
+	ofFill();
+	float rowHeight = bounds.height / (noteRange.span()+1);
+	
+	for (int i = 0; i <= noteRange.span(); i++) {
+		// alternate row colors
+		if(i%2 == 1) {
+			ofSetColor(255, 255, 255, 50);
+		} else {
+			ofSetColor(255, 255, 255, 25);
+		}
+		
+        // set row color here separately to override row bg color
+        // ...
+		ofRect(bounds.x, bounds.y + i * rowHeight, bounds.width, rowHeight);
+	}
 	
 	//draw a little wobble if its on
 	//if(isOnAtMillis(timeline->getCurrentTimeMillis())){
@@ -155,6 +172,10 @@ bool ofxTLNotes::isOnAtPercent(float percent){
 }
 
 bool ofxTLNotes::mousePressed(ofMouseEventArgs& args, long millis){
+    
+    // temp
+    int pitch = pitchForScreenY(args.y);
+    cout << "detected pitch as " << pitch;
     
 	if(placingSwitch != NULL){
 		if(isActive() && args.button == 0){
@@ -460,4 +481,11 @@ ofxTLKeyframe* ofxTLNotes::keyframeAtScreenpoint(ofVec2f p){
 
 string ofxTLNotes::getTrackType(){
     return "Switches";
+}
+
+#pragma mark NOTE METHODS
+int ofxTLNotes::pitchForScreenY(int y) {
+	float normalizedY = (y - bounds.y) / bounds.height;
+	int pitch = ofClamp(ofMap(normalizedY, 1, 0, noteRange.min, noteRange.max + 1), noteRange.min, noteRange.max); // clamp to range
+	return pitch;
 }
