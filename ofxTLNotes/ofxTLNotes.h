@@ -50,8 +50,6 @@ public:
     int velocity;
     int channel;
 	bool growing;
-	bool triggeredOn;
-	bool triggeredOff;
 };
 
 class ofxTLNotes : public ofxTLSwitches {
@@ -82,6 +80,7 @@ public:
     virtual string getTrackType();
     virtual void pasteSent(string pasteboard);
     
+    // Note-Specific
     void addKeyframeAtMillis(float value, unsigned long millis, bool isGrowing = false);
     void finishNote(float value);
 	
