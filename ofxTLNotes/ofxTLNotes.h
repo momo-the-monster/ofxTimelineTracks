@@ -101,4 +101,5 @@ protected:
     bool endHover;
     ofxTLNote* placingSwitch;
     
+    void playbackLooped(ofxTLPlaybackEventArgs &args);
 };

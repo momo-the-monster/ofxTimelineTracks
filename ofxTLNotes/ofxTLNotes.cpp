@@ -46,6 +46,7 @@ ofxTLNotes::~ofxTLNotes(){
 void ofxTLNotes::update(){
     for (int i = 0; i < keyframes.size(); ++i) {
         ofxTLNote* key = (ofxTLNote*)keyframes[i];
+        // grow active notes
         if(key->growing){
             key->timeRange.max = currentTrackTime();
         }
@@ -528,6 +529,16 @@ void ofxTLNotes::finishNote(float value){
         ofxTLNote* key = (ofxTLNote*)keyframes[i];
         if(key->growing && key->value == value){
             key->growing = false;
+        }
+    }
+}
+
+void ofxTLNotes::playbackLooped(ofxTLPlaybackEventArgs &args){
+    for(int i = 0; i < keyframes.size(); i++){
+		ofxTLNote* switchKey = (ofxTLNote*)keyframes[i];
+    	if(switchKey->growing){
+            switchKey->growing = false;
+            switchKey->timeRange.max = getTimeline()->getOutTimeInMillis();
         }
     }
 }
