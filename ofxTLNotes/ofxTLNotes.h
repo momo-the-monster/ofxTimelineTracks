@@ -44,6 +44,14 @@ public:
 	bool endSelected;
     long edgeDragOffset;
     ofRectangle display;
+    
+    // note stuff
+    int pitch;
+    int velocity;
+    int channel;
+	bool growing;
+	bool triggeredOn;
+	bool triggeredOff;
 };
 
 class ofxTLNotes : public ofxTLKeyframes {
