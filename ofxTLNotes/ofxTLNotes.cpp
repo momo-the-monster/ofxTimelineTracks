@@ -210,7 +210,7 @@ bool ofxTLNotes::mousePressed(ofMouseEventArgs& args, long millis){
             
             ofxTLNote* switchKey = (ofxTLNote*)keyframes[i];
             //unselect everything else if we just clicked this edge without shift held down
-            startSelected = abs(switchKey->display.x - args.x) < 10.0;
+            startSelected = (abs(switchKey->display.x - args.x) < 10.0 && switchKey->display.inside(args.x,args.y));
             if (startSelected && !switchKey->startSelected && !ofGetModifierSelection()) {
                 timeline->unselectAll();
             }
@@ -222,7 +222,7 @@ bool ofxTLNotes::mousePressed(ofMouseEventArgs& args, long millis){
                 switchKey->startSelected |= startSelected;
             }
             float endEdge = switchKey->display.x+switchKey->display.width;
-            endSelected = abs(endEdge - args.x) < 10.0;
+            endSelected = (abs(endEdge - args.x) < 10.0 && switchKey->display.inside(args.x,args.y));
             //don't let them both be selected in one click!
             if(!startSelected && endSelected && !switchKey->endSelected && !ofGetModifierSelection()){
                 timeline->unselectAll();
