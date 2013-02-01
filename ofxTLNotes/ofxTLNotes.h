@@ -39,28 +39,19 @@ public:
 	ofLongRange timeRange;
 	
 	//ui stuff
+    //	ofRange dragOffsets;
 	bool startSelected;
 	bool endSelected;
     long edgeDragOffset;
     ofRectangle display;
-    
-    bool startHovered;
-	bool endHovered;
-	
-	int pitch;
-	int velocity;
-	int channel;
-	bool growing;
-	bool triggeredOn;
-	bool triggeredOff;
 };
 
 class ofxTLNotes : public ofxTLKeyframes {
-  public:
+public:
 	ofxTLNotes();
 	virtual ~ofxTLNotes();
-	
-	virtual void draw();
+    
+    virtual void draw();
     
 	virtual bool isOn();
     virtual bool isOnAtMillis(long millis);
