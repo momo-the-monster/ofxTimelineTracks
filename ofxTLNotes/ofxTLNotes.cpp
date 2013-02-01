@@ -173,10 +173,9 @@ bool ofxTLNotes::isOnAtPercent(float percent){
 
 bool ofxTLNotes::mousePressed(ofMouseEventArgs& args, long millis){
     
-    // temp
-    int pitch = pitchForScreenY(args.y);
-    cout << "detected pitch as " << pitch;
-    
+    // if you're placing a switch and you just pressed the left button
+    // then set its end time to the pressed location
+    // if you're placing a switch and you pressed any other button, toss it and clean up
 	if(placingSwitch != NULL){
 		if(isActive() && args.button == 0){
 			placingSwitch->timeRange.max = millis;
@@ -439,6 +438,11 @@ ofxTLKeyframe* ofxTLNotes::newKeyframe(){
 	
 	//for just placing a switch we'll be able to decide the end position
 	placingSwitch = switchKey;
+    
+    // add pitch based on mouseY if that's the input device
+    if(createNewOnMouseup){
+        switchKey->pitch = pitchForScreenY(ofGetMouseY());
+    }
 	
     return switchKey;
 }
