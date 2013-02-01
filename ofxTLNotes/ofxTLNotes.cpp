@@ -74,16 +74,17 @@ void ofxTLNotes::draw(){
 	}
     
     for(int i = 0; i < keyframes.size(); i++){
+        // Calculate Note Bounds
         ofxTLNote* switchKey = (ofxTLNote*)keyframes[i];
         float startScreenX = MAX(millisToScreenX(switchKey->timeRange.min), 0);
         float endScreenX = MIN(millisToScreenX(switchKey->timeRange.max), bounds.getMaxX());
 		if(startScreenX == endScreenX){
 			continue;
 		}
-		switchKey->display = ofRectangle(startScreenX, bounds.y, endScreenX-startScreenX, bounds.height);
-        
-        //draw handles
-        
+        int whichRow = ofMap(switchKey->pitch, noteRange.max, noteRange.min, 0, noteRange.span());
+		switchKey->display = ofRectangle(startScreenX, bounds.y + whichRow * rowHeight, endScreenX-startScreenX, rowHeight);
+            
+        // Drawing The Handles
         ofSetLineWidth(2);
         bool keyIsSelected = isKeyframeSelected(switchKey);
         if(keyIsSelected || switchKey->startSelected){
@@ -92,9 +93,9 @@ void ofxTLNotes::draw(){
         else{
 	        ofSetColor(timeline->getColors().keyColor);
         }
-        
-        ofLine(switchKey->display.x, bounds.y,
-               switchKey->display.x, bounds.y+bounds.height);
+        // Do Left Line
+        ofLine(switchKey->display.x, switchKey->display.y,
+               switchKey->display.x, switchKey->display.y + switchKey->display.height);
         
         if(keyIsSelected || switchKey->endSelected){
 	        ofSetColor(timeline->getColors().textColor);
@@ -102,8 +103,9 @@ void ofxTLNotes::draw(){
         else{
 	        ofSetColor(timeline->getColors().keyColor);
         }
-        ofLine(switchKey->display.x+switchKey->display.width, bounds.y,
-               switchKey->display.x+switchKey->display.width, bounds.y+bounds.height);
+        // Do Right Line
+        ofLine(switchKey->display.x+switchKey->display.width,  switchKey->display.y,
+               switchKey->display.x+switchKey->display.width, switchKey->display.y + switchKey->display.height);
         
         //draw region
         if(keyIsSelected){
