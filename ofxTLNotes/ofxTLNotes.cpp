@@ -48,7 +48,7 @@ void ofxTLNotes::draw(){
     ofPushStyle();
 	ofFill();
     
-    //************************ Range Rows
+    // Draw Row BGs
 	ofFill();
 	float rowHeight = bounds.height / (noteRange.span()+1);
 	
@@ -65,8 +65,6 @@ void ofxTLNotes::draw(){
 		ofRect(bounds.x, bounds.y + i * rowHeight, bounds.width, rowHeight);
 	}
 	
-	//draw a little wobble if its on
-	//if(isOnAtMillis(timeline->getCurrentTimeMillis())){
 	//play solo change
 	if(isOn()){
 		ofSetColor(timeline->getColors().disabledColor, 20+(1-powf(sin(ofGetElapsedTimef()*5)*.5+.5,2))*20);
@@ -325,13 +323,13 @@ void ofxTLNotes::mouseMoved(ofMouseEventArgs& args, long millis){
 	
     for(int i = 0; i < keyframes.size(); i++){
         ofxTLNote* switchKey = (ofxTLNote*)keyframes[i];
-        if(abs(switchKey->display.x - args.x) < 10.0 && bounds.inside(args.x,args.y)){
+        if(abs(switchKey->display.x - args.x) < 10.0 && switchKey->display.inside(args.x,args.y)){
             hoverKeyframe = switchKey;
             startHover = true;
             return; //return cancels call to parent
         }
         float endEdge = switchKey->display.x+switchKey->display.width;
-        if(abs(endEdge - args.x) < 10.0 && bounds.inside(args.x,args.y)){
+        if(abs(endEdge - args.x) < 10.0 && switchKey->display.inside(args.x,args.y)){
             hoverKeyframe = switchKey;
             endHover = true;
             return; //cancels call to parent
