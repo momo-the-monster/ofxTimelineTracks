@@ -62,6 +62,7 @@ public:
     // note-specific:
     int pitchForScreenY(int y);
     
+    virtual void update();
     virtual void draw();
     
 	virtual bool isOn();
@@ -80,6 +81,9 @@ public:
     
     virtual string getTrackType();
     virtual void pasteSent(string pasteboard);
+    
+    void addKeyframeAtMillis(float value, unsigned long millis, bool isGrowing = false);
+    void finishNote(float value);
 	
 protected:
     virtual ofxTLKeyframe* newKeyframe();

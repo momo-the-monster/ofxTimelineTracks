@@ -43,6 +43,15 @@ ofxTLNotes::~ofxTLNotes(){
     
 }
 
+void ofxTLNotes::update(){
+    for (int i = 0; i < keyframes.size(); ++i) {
+        ofxTLNote* key = (ofxTLNote*)keyframes[i];
+        if(key->growing){
+            key->timeRange.max = currentTrackTime();
+        }
+    }
+}
+
 void ofxTLNotes::draw(){
     
     ofPushStyle();
@@ -80,6 +89,7 @@ void ofxTLNotes::draw(){
 			continue;
 		}
         int whichRow = ofMap(switchKey->pitch, valueRange.max, valueRange.min, 0, valueRange.span());
+//        int whichRow = ofMap(switchKey->value, valueRange.max, valueRange.min, 0, valueRange.span());
 		switchKey->display = ofRectangle(startScreenX, bounds.y + whichRow * rowHeight, endScreenX-startScreenX, rowHeight);
             
         // Drawing The Handles
@@ -492,4 +502,32 @@ int ofxTLNotes::pitchForScreenY(int y) {
 	float normalizedY = (y - bounds.y) / bounds.height;
 	int pitch = ofClamp(ofMap(normalizedY, 1, 0, valueRange.min, valueRange.max + 1), valueRange.min, valueRange.max); // clamp to range
 	return pitch;
+}
+
+
+void ofxTLNotes::addKeyframeAtMillis(float value, unsigned long millis, bool isGrowing){
+	ofxTLNote* key = (ofxTLNote*)newKeyframe();
+	key->time = key->previousTime = millis;
+    key->timeRange.min = millis;
+    key->timeRange.max = millis + 100;
+	key->pitch = ofMap(value, 0, 1, valueRange.min, valueRange.max, true);
+    key->value = value;
+    key->growing = isGrowing;
+	keyframes.push_back(key);
+	//smart sort, only sort if not added to end
+	if(keyframes.size() > 2 && keyframes[keyframes.size()-2]->time > keyframes[keyframes.size()-1]->time){
+		updateKeyframeSort();
+	}
+	lastKeyframeIndex = 1;
+	timeline->flagTrackModified(this);
+	shouldRecomputePreviews = true;
+}
+
+void ofxTLNotes::finishNote(float value){
+    for (int i = 0; i < keyframes.size(); ++i) {
+        ofxTLNote* key = (ofxTLNote*)keyframes[i];
+        if(key->growing && key->value == value){
+            key->growing = false;
+        }
+    }
 }
