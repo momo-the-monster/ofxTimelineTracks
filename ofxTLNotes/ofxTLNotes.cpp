@@ -301,6 +301,7 @@ void ofxTLNotes::updateEdgeDragOffsets(long clickMillis){
     }
 }
 
+//TODO: make range select respect rows separate from time
 void ofxTLNotes::mouseDragged(ofMouseEventArgs& args, long millis){
     
     //do the normal dragging behavior for selected keyframes
@@ -511,14 +512,17 @@ void ofxTLNotes::addKeyframeAtMillis(float value, unsigned long millis, bool isG
 	key->time = key->previousTime = millis;
     key->timeRange.min = millis;
     key->timeRange.max = millis + 100;
-	key->pitch = ofMap(value, 0, 1, valueRange.min, valueRange.max, true);
+	key->pitch = ofMap(value, 0, 1, 0, 127, true);
     key->value = value;
     key->growing = isGrowing;
 	keyframes.push_back(key);
+//    ofRange newRange = getValueRange();
+//    valueRange.growToInclude(key->pitch);
 	//smart sort, only sort if not added to end
 	if(keyframes.size() > 2 && keyframes[keyframes.size()-2]->time > keyframes[keyframes.size()-1]->time){
 		updateKeyframeSort();
 	}
+    trimToPitches();
 	lastKeyframeIndex = 1;
 	timeline->flagTrackModified(this);
 	shouldRecomputePreviews = true;
@@ -528,7 +532,8 @@ void ofxTLNotes::finishNote(float value){
     for (int i = 0; i < keyframes.size(); ++i) {
         ofxTLNote* key = (ofxTLNote*)keyframes[i];
         if(key->growing && key->value == value){
-            key->growing = false;
+            key->growing = false;                           // stop growing
+            key->endSelected = key->startSelected = false;  // deselect
         }
     }
 }
@@ -538,7 +543,22 @@ void ofxTLNotes::playbackLooped(ofxTLPlaybackEventArgs &args){
 		ofxTLNote* switchKey = (ofxTLNote*)keyframes[i];
     	if(switchKey->growing){
             switchKey->growing = false;
+            switchKey->endSelected = switchKey->startSelected = false;
             switchKey->timeRange.max = getTimeline()->getOutTimeInMillis();
         }
     }
+}
+
+void ofxTLNotes::trimToPitches(){
+    if(keyframes.size() == 0) return;
+    // set range to first note pitch
+    ofxTLNote* switchKey = (ofxTLNote*)keyframes[0];
+    ofRange newRange = ofRange(switchKey->pitch, switchKey->pitch);
+    // iterate through all keys, expand to fit pitches
+    for(int i = 1; i < keyframes.size(); i++){
+		switchKey = (ofxTLNote*)keyframes[i];
+        newRange.min = MIN(newRange.min, switchKey->pitch);
+        newRange.max = MAX(newRange.max, switchKey->pitch);
+    }
+    setValueRange(newRange);
 }
