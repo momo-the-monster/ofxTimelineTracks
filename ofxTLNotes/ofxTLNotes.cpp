@@ -34,23 +34,53 @@
 #include "ofxTimeline.h"
 #include "ofxHotKeys.h"
 
+ofxTLNote::ofxTLNote(){
+    isOn = false;
+    wasOn = false;
+    triggeredOn = false;
+    triggeredOff = false;
+    
+}
+
 ofxTLNotes::ofxTLNotes(){
 	placingSwitch = NULL;
     valueRange = ofRange(0,11);
 }
 
 ofxTLNotes::~ofxTLNotes(){
-    
+    //TODO: get rid of this?
+    lastUpdateSample = 0;
 }
 
 void ofxTLNotes::update(){
+    
+    long thisUpdateSample = timeline->getCurrentTimeMillis();
     for (int i = 0; i < keyframes.size(); ++i) {
         ofxTLNote* key = (ofxTLNote*)keyframes[i];
+        key->wasOn = key->isOn;
+        key->isOn = key->timeRange.contains(thisUpdateSample);
+        
+        if(key->isOn && !key->wasOn){
+            cout << "ON" << endl;
+            key->triggeredOn = true;
+        } else {
+            key->triggeredOn = false;
+        }
+            
+        if (!key->isOn && key->wasOn){
+            cout << "OFF" << endl;
+            key->triggeredOff = true;
+        } else {
+            key->triggeredOff = false;
+        }
+        
         // grow active notes
         if(key->growing){
             key->timeRange.max = currentTrackTime();
         }
+        
     }
+    lastUpdateSample = thisUpdateSample;
 }
 
 void ofxTLNotes::draw(){
@@ -556,6 +586,10 @@ void ofxTLNotes::finishNote(float value){
     }
 }
 
+void ofxTLNotes::playbackStarted(ofxTLPlaybackEventArgs &args){
+    lastUpdateSample = timeline->getCurrentTimeMillis();
+}
+
 void ofxTLNotes::playbackLooped(ofxTLPlaybackEventArgs &args){
     for(int i = 0; i < keyframes.size(); i++){
 		ofxTLNote* switchKey = (ofxTLNote*)keyframes[i];
@@ -564,6 +598,9 @@ void ofxTLNotes::playbackLooped(ofxTLPlaybackEventArgs &args){
             switchKey->endSelected = switchKey->startSelected = false;
             switchKey->timeRange.max = getTimeline()->getOutTimeInMillis();
         }
+        
+//        switchKey->triggeredOn = switchKey->triggeredOff = false;
+        lastUpdateSample = timeline->getCurrentTimeMillis();
     }
 }
 
@@ -579,4 +616,14 @@ void ofxTLNotes::trimToPitches(){
         newRange.max = MAX(newRange.max, switchKey->pitch);
     }
     setValueRange(newRange);
+}
+
+vector<ofxTLNote*> ofxTLNotes::getDirtyNotes(){
+    vector<ofxTLNote*>notes;
+    for (int i = 0; i < keyframes.size(); ++i) {
+        ofxTLNote* switchKey = (ofxTLNote*)keyframes[0];
+        if(switchKey->triggeredOff || switchKey->triggeredOn)
+            notes.push_back(switchKey);
+    }
+    return notes;
 }

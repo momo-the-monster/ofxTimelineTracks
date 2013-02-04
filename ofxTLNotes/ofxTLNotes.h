@@ -35,6 +35,9 @@
 
 class ofxTLNote : public ofxTLSwitch {
 public:
+    
+    ofxTLNote();
+    
     //NOTE this does not use time, but copies everything into the range
 	ofLongRange timeRange;
 	
@@ -50,6 +53,10 @@ public:
     int velocity;
     int channel;
 	bool growing;
+    bool isOn;
+    bool wasOn;
+    bool triggeredOn;
+    bool triggeredOff;
 };
 
 class ofxTLNotes : public ofxTLSwitches {
@@ -84,6 +91,7 @@ public:
     void addKeyframeAtMillis(float value, unsigned long millis, bool isGrowing = false);
     void finishNote(float value);
     void trimToPitches();
+    vector<ofxTLNote*> getDirtyNotes();
 	
 protected:
     virtual ofxTLKeyframe* newKeyframe();
@@ -102,6 +110,8 @@ protected:
     ofxTLNote* placingSwitch;
     bool pitchIsOn(int pitch);
     bool pitchIsOnAtMillis(int pitch, long millis);
+    long lastUpdateSample;
     
     void playbackLooped(ofxTLPlaybackEventArgs &args);
+    void playbackStarted(ofxTLPlaybackEventArgs &args);
 };
