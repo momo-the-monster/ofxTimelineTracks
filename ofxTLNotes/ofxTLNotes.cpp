@@ -618,6 +618,12 @@ void ofxTLNotes::trimToPitches(){
         newRange.max = MAX(newRange.max, switchKey->pitch);
     }
     setValueRange(newRange);
+    
+    // fix values of each keyframes
+    for (int i = 0; i < keyframes.size(); ++i) {
+        switchKey = (ofxTLNote*)keyframes[i];
+        switchKey->value = ofMap(switchKey->pitch, valueRange.min, valueRange.max, 0, 1);
+    }
 }
 
 vector<ofxTLNote*> ofxTLNotes::getDirtyNotes(){
