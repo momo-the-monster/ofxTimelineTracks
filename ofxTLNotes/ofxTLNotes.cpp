@@ -76,10 +76,10 @@ void ofxTLNotes::draw(){
 	}
 	
 	//play solo change
-	if(isOn()){
-		ofSetColor(timeline->getColors().disabledColor, 20+(1-powf(sin(ofGetElapsedTimef()*5)*.5+.5,2))*20);
-		ofRect(bounds);
-	}
+//	if(isOn()){
+//		ofSetColor(timeline->getColors().disabledColor, 20+(1-powf(sin(ofGetElapsedTimef()*5)*.5+.5,2))*20);
+//		ofRect(bounds.x, bounds.y + i * rowHeight, bounds.width, rowHeight);
+//	}
     
     for(int i = 0; i < keyframes.size(); i++){
         // Calculate Note Bounds
@@ -90,7 +90,6 @@ void ofxTLNotes::draw(){
 			continue;
 		}
         int whichRow = ofMap(switchKey->pitch, valueRange.max, valueRange.min, 0, valueRange.span());
-//        int whichRow = ofMap(switchKey->value, valueRange.max, valueRange.min, 0, valueRange.span());
 		switchKey->display = ofRectangle(startScreenX, bounds.y + whichRow * rowHeight, endScreenX-startScreenX, rowHeight);
             
         // Drawing The Handles
@@ -473,9 +472,14 @@ void ofxTLNotes::restoreKeyframe(ofxTLKeyframe* key, ofxXmlSettings& xmlStore){
     }
     //this is so freshly restored keys won't have ends selected but click keys will
     switchKey->startSelected = switchKey->endSelected = false;
+    
+    // restore pitch
+    int pitch = xmlStore.getValue("pitch", 0);
+    switchKey->pitch = pitch;
 	
 	//a bit of a hack, but if
 	placingSwitch = NULL;
+    trimToPitches();
 }
 
 void ofxTLNotes::storeKeyframe(ofxTLKeyframe* key, ofxXmlSettings& xmlStore){
@@ -483,6 +487,7 @@ void ofxTLNotes::storeKeyframe(ofxTLKeyframe* key, ofxXmlSettings& xmlStore){
     ofxTLNote* switchKey = (ofxTLNote* )key;
     switchKey->time = switchKey->timeRange.min;
 	xmlStore.addValue("max", timeline->getTimecode().timecodeForMillis(switchKey->timeRange.max));
+    xmlStore.addValue("pitch", switchKey->pitch);
 }
 
 ofxTLKeyframe* ofxTLNotes::keyframeAtScreenpoint(ofVec2f p){
@@ -516,8 +521,6 @@ void ofxTLNotes::addKeyframeAtMillis(float value, unsigned long millis, bool isG
     key->value = value;
     key->growing = isGrowing;
 	keyframes.push_back(key);
-//    ofRange newRange = getValueRange();
-//    valueRange.growToInclude(key->pitch);
 	//smart sort, only sort if not added to end
 	if(keyframes.size() > 2 && keyframes[keyframes.size()-2]->time > keyframes[keyframes.size()-1]->time){
 		updateKeyframeSort();
