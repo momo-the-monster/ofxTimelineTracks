@@ -534,6 +534,7 @@ void ofxTLNotes::finishNote(float value){
         if(key->growing && key->value == value){
             key->growing = false;                           // stop growing
             key->endSelected = key->startSelected = false;  // deselect
+            placingSwitch = NULL;
         }
     }
 }
