@@ -560,13 +560,13 @@ int ofxTLNotes::pitchForScreenY(int y) {
 }
 
 
-void ofxTLNotes::addKeyframeAtMillis(float value, unsigned long millis, bool isGrowing){
+void ofxTLNotes::addKeyframeAtMillis(int pitch, unsigned long millis, bool isGrowing){
 	ofxTLNote* key = (ofxTLNote*)newKeyframe();
 	key->time = key->previousTime = millis;
     key->timeRange.min = millis;
     key->timeRange.max = millis + 100;
-	key->pitch = ofMap(value, 0, 1, 0, 127, true);
-    key->value = value;
+    key->pitch = pitch;
+	key->value = ofMap(pitch, valueRange.min, valueRange.max, 0, 1, true);
     key->growing = isGrowing;
 	keyframes.push_back(key);
 	//smart sort, only sort if not added to end
@@ -579,10 +579,11 @@ void ofxTLNotes::addKeyframeAtMillis(float value, unsigned long millis, bool isG
 	shouldRecomputePreviews = true;
 }
 
-void ofxTLNotes::finishNote(float value){
+void ofxTLNotes::finishNote(int pitch){
     for (int i = 0; i < keyframes.size(); ++i) {
         ofxTLNote* key = (ofxTLNote*)keyframes[i];
-        if(key->growing && key->value == value){
+        int diff = key->pitch - pitch;
+        if(key->growing && key->pitch == pitch){
             key->growing = false;                           // stop growing
             key->endSelected = key->startSelected = false;  // deselect
             placingSwitch = NULL;

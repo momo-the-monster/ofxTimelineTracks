@@ -89,8 +89,8 @@ public:
     virtual void pasteSent(string pasteboard);
     
     // Note-Specific
-    void addKeyframeAtMillis(float value, unsigned long millis, bool isGrowing = false);
-    void finishNote(float value);
+    void addKeyframeAtMillis(int pitch, unsigned long millis, bool isGrowing = false);
+    void finishNote(int pitch);
     void trimToPitches();
     vector<ofxTLNote*> getDirtyNotes();
 	
