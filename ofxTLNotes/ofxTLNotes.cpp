@@ -70,16 +70,13 @@ void ofxTLNotes::draw(){
 			ofSetColor(255, 255, 255, 25);
 		}
 		
-        // set row color here separately to override row bg color
-        // ...
+        // set row color for active notes
+        int whichRow = ofMap(i, 0, valueRange.span(), valueRange.max, valueRange.min);
+        if(pitchIsOn(whichRow)){
+            ofSetColor(0, 0, 0, 100);
+        }
 		ofRect(bounds.x, bounds.y + i * rowHeight, bounds.width, rowHeight);
 	}
-	
-	//play solo change
-//	if(isOn()){
-//		ofSetColor(timeline->getColors().disabledColor, 20+(1-powf(sin(ofGetElapsedTimef()*5)*.5+.5,2))*20);
-//		ofRect(bounds.x, bounds.y + i * rowHeight, bounds.width, rowHeight);
-//	}
     
     for(int i = 0; i < keyframes.size(); i++){
         // Calculate Note Bounds
@@ -174,6 +171,23 @@ bool ofxTLNotes::isOnAtMillis(long millis){
 
 bool ofxTLNotes::isOn(){
 	return isOnAtMillis(currentTrackTime());
+}
+
+bool ofxTLNotes::pitchIsOnAtMillis(int pitch, long millis){
+    for(int i = 0; i < keyframes.size(); i++){
+        ofxTLNote* switchKey = (ofxTLNote*)keyframes[i];
+        if(switchKey->timeRange.min > millis){
+            break;
+        }
+        if(switchKey->timeRange.contains(millis) && switchKey->pitch == pitch){
+            return true;
+        }
+    }
+    return false;
+}
+
+bool ofxTLNotes::pitchIsOn(int pitch){
+    return pitchIsOnAtMillis(pitch, currentTrackTime());
 }
 
 bool ofxTLNotes::isOnAtPercent(float percent){

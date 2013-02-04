@@ -100,6 +100,8 @@ protected:
     bool startHover;
     bool endHover;
     ofxTLNote* placingSwitch;
+    bool pitchIsOn(int pitch);
+    bool pitchIsOnAtMillis(int pitch, long millis);
     
     void playbackLooped(ofxTLPlaybackEventArgs &args);
 };
