@@ -39,7 +39,7 @@ ofxTLNote::ofxTLNote(){
     wasOn = false;
     triggeredOn = false;
     triggeredOff = false;
-    
+    triggerWasRead = false;
 }
 
 ofxTLNotes::ofxTLNotes(){
@@ -48,8 +48,6 @@ ofxTLNotes::ofxTLNotes(){
 }
 
 ofxTLNotes::~ofxTLNotes(){
-    //TODO: get rid of this?
-    lastUpdateSample = 0;
 }
 
 void ofxTLNotes::update(){
@@ -57,21 +55,21 @@ void ofxTLNotes::update(){
     long thisUpdateSample = timeline->getCurrentTimeMillis();
     for (int i = 0; i < keyframes.size(); ++i) {
         ofxTLNote* key = (ofxTLNote*)keyframes[i];
+        
+        // track trigger on/off
         key->wasOn = key->isOn;
         key->isOn = key->timeRange.contains(thisUpdateSample);
-        
         if(key->isOn && !key->wasOn){
-            cout << "ON" << endl;
             key->triggeredOn = true;
-        } else {
-            key->triggeredOn = false;
         }
-            
-        if (!key->isOn && key->wasOn){
-            cout << "OFF" << endl;
+        else if (!key->isOn && key->wasOn){
             key->triggeredOff = true;
-        } else {
-            key->triggeredOff = false;
+        }
+        
+        // reset 'read' flag if we used it
+        if (key->triggerWasRead) {
+            key->triggeredOn = key->triggeredOff = false;
+            key->triggerWasRead = false;
         }
         
         // grow active notes
@@ -80,7 +78,6 @@ void ofxTLNotes::update(){
         }
         
     }
-    lastUpdateSample = thisUpdateSample;
 }
 
 void ofxTLNotes::draw(){
@@ -505,6 +502,13 @@ ofxTLKeyframe* ofxTLNotes::newKeyframe(){
 void ofxTLNotes::restoreKeyframe(ofxTLKeyframe* key, ofxXmlSettings& xmlStore){
     //pull the saved time into min, and our custom max value
     ofxTLNote* switchKey = (ofxTLNote*)key;
+    // TODO: reset function for note?
+    switchKey->wasOn = false;
+    switchKey->isOn = false;
+    switchKey->triggeredOn = false;
+    switchKey->triggeredOff = false;
+    switchKey->growing = false;
+    
     switchKey->timeRange.min = switchKey->time;
     //
     string timecode = xmlStore.getValue("max", "00:00:00:000");
@@ -587,7 +591,7 @@ void ofxTLNotes::finishNote(float value){
 }
 
 void ofxTLNotes::playbackStarted(ofxTLPlaybackEventArgs &args){
-    lastUpdateSample = timeline->getCurrentTimeMillis();
+
 }
 
 void ofxTLNotes::playbackLooped(ofxTLPlaybackEventArgs &args){
@@ -599,8 +603,6 @@ void ofxTLNotes::playbackLooped(ofxTLPlaybackEventArgs &args){
             switchKey->timeRange.max = getTimeline()->getOutTimeInMillis();
         }
         
-//        switchKey->triggeredOn = switchKey->triggeredOff = false;
-        lastUpdateSample = timeline->getCurrentTimeMillis();
     }
 }
 
@@ -621,9 +623,13 @@ void ofxTLNotes::trimToPitches(){
 vector<ofxTLNote*> ofxTLNotes::getDirtyNotes(){
     vector<ofxTLNote*>notes;
     for (int i = 0; i < keyframes.size(); ++i) {
-        ofxTLNote* switchKey = (ofxTLNote*)keyframes[0];
-        if(switchKey->triggeredOff || switchKey->triggeredOn)
-            notes.push_back(switchKey);
+        ofxTLNote* sourceKey = (ofxTLNote*)keyframes[i];
+        if(sourceKey->triggeredOff || sourceKey->triggeredOn){
+            if(sourceKey->triggerWasRead == false){
+                notes.push_back(sourceKey);
+                sourceKey->triggerWasRead = true;
+            }
+        }
     }
     return notes;
 }

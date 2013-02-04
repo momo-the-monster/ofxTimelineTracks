@@ -57,6 +57,7 @@ public:
     bool wasOn;
     bool triggeredOn;
     bool triggeredOff;
+    bool triggerWasRead;
 };
 
 class ofxTLNotes : public ofxTLSwitches {
