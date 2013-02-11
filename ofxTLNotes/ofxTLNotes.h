@@ -51,7 +51,6 @@ public:
     // note stuff
     int pitch;
     int velocity;
-    int channel;
 	bool growing;
     bool isOn;
     bool wasOn;
