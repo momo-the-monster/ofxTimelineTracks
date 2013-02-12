@@ -50,7 +50,7 @@ public:
     
     // note stuff
     int pitch;
-    int velocity;
+    float velocity;
 	bool growing;
     bool isOn;
     bool wasOn;
@@ -88,10 +88,11 @@ public:
     virtual void pasteSent(string pasteboard);
     
     // Note-Specific
-    void addKeyframeAtMillis(int pitch, unsigned long millis, bool isGrowing = false);
+    void addKeyframeAtMillis(int pitch, float velocity, unsigned long millis, bool isGrowing = false);
     void finishNote(int pitch);
     void trimToPitches();
     vector<ofxTLNote*> getDirtyNotes();
+    bool oneArgMode;
 	
 protected:
     virtual ofxTLKeyframe* newKeyframe();

@@ -44,6 +44,7 @@ ofxTLNote::ofxTLNote(){
 
 ofxTLNotes::ofxTLNotes(){
 	placingSwitch = NULL;
+    oneArgMode = false;
     valueRange = ofRange(0,11);
 }
 
@@ -524,6 +525,9 @@ void ofxTLNotes::restoreKeyframe(ofxTLKeyframe* key, ofxXmlSettings& xmlStore){
     // restore pitch
     int pitch = xmlStore.getValue("pitch", 0);
     switchKey->pitch = pitch;
+    
+    float velocity = xmlStore.getValue("velocity", 0.0f);
+    switchKey->velocity = velocity;
 	
 	//a bit of a hack, but if
 	placingSwitch = NULL;
@@ -536,6 +540,7 @@ void ofxTLNotes::storeKeyframe(ofxTLKeyframe* key, ofxXmlSettings& xmlStore){
     switchKey->time = switchKey->timeRange.min;
 	xmlStore.addValue("max", timeline->getTimecode().timecodeForMillis(switchKey->timeRange.max));
     xmlStore.addValue("pitch", switchKey->pitch);
+    xmlStore.addValue("velocity", switchKey->velocity);
 }
 
 ofxTLKeyframe* ofxTLNotes::keyframeAtScreenpoint(ofVec2f p){
@@ -560,12 +565,14 @@ int ofxTLNotes::pitchForScreenY(int y) {
 }
 
 
-void ofxTLNotes::addKeyframeAtMillis(int pitch, unsigned long millis, bool isGrowing){
+void ofxTLNotes::addKeyframeAtMillis(int pitch, float velocity, unsigned long millis, bool isGrowing){
 	ofxTLNote* key = (ofxTLNote*)newKeyframe();
 	key->time = key->previousTime = millis;
     key->timeRange.min = millis;
     key->timeRange.max = millis + 100;
     key->pitch = pitch;
+    key->velocity = velocity;
+    cout << "added keyframe with velocity " << key->velocity << endl;
 	key->value = ofMap(pitch, valueRange.min, valueRange.max, 0, 1, true);
     key->growing = isGrowing;
 	keyframes.push_back(key);
