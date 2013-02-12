@@ -2,9 +2,17 @@ ofxTimelineTracks
 =================
 
 Tracks to use with ofxTimeline
+----
+ofxTLNote
+----
+Generic Note Container - holds Pitch as an integer and Velocity as a normalized float
+Enter notes via OSC (you can use midi via Osculator if you need)
+Resize/move notes with mouse
+Save/Load notes from xml file
+
 
 ----
-ofxTLMidiNote
+ofxTLMidiNote (deprecated, no longer works with the current ofxTimeline)
 ----
 Video example: https://vimeo.com/46793363
 
